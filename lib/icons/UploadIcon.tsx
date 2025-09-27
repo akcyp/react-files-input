@@ -7,7 +7,7 @@ export const UploadIcon = () => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className="size-6"
+    className=":uno: size-6"
   >
     <path
       strokeLinecap="round"

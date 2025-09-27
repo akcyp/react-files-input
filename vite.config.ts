@@ -9,7 +9,7 @@ const libraryOptions: UserConfig = {
   publicDir: false,
   build: {
     lib: {
-      name: 'react-files-uploader',
+      name: 'react-files-upload',
       entry: resolve(__dirname, 'lib/index.ts'),
       formats: ['es'],
       fileName: 'index'
@@ -18,7 +18,7 @@ const libraryOptions: UserConfig = {
 };
 
 const staticPageOptions: UserConfig = {
-  base: '/react-files-uploader/',
+  base: '/react-files-upload/',
   build: {
     outDir: 'build'
   }
@@ -27,7 +27,9 @@ const staticPageOptions: UserConfig = {
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
-    UnoCSS(),
+    UnoCSS({
+      mode: 'dist-chunk'
+    }),
     eslint(),
     mode !== 'build:ci' &&
       dts({

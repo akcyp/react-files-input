@@ -1,5 +1,5 @@
 {
-  "name": "react-files-uploader",
+  "name": "react-files-upload",
   "description": "React component to upload multiple files",
   "version": "0.0.1",
   "author": "akcyp",
@@ -11,11 +11,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akcyp/react-files-uploader.git"
+    "url": "git+https://github.com/akcyp/react-files-upload.git"
   },
-  "homepage": "https://github.com/akcyp/react-files-uploader#readme",
+  "homepage": "https://github.com/akcyp/react-files-upload#readme",
   "bugs": {
-    "url": "https://github.com/akcyp/react-files-uploader/issues"
+    "url": "https://github.com/akcyp/react-files-upload/issues"
   },
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",
@@ -58,6 +58,7 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@unocss/preset-wind3": "^66.5.2",
+    "@unocss/transformer-compile-class": "^66.5.2",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",

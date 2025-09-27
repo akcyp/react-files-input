@@ -2,11 +2,12 @@ import { useEffect, useRef } from 'react';
 import { FileUploader } from '../lib';
 
 export const RealUpload = () => {
-  const abortCtrl = useRef(new AbortController());
+  const abortCtrl = useRef<AbortController>();
 
   useEffect(() => {
+    abortCtrl.current = new AbortController();
     return () => {
-      abortCtrl.current.abort();
+      abortCtrl.current?.abort();
     };
   }, []);
 
@@ -17,7 +18,7 @@ export const RealUpload = () => {
     const response = await fetch('/example', {
       method: 'POST',
       body: data,
-      signal: abortCtrl.current.signal
+      signal: abortCtrl.current?.signal
     });
 
     if (response.status >= 200 && response.status < 300) {
@@ -29,7 +30,7 @@ export const RealUpload = () => {
   const onFileDelete = async (file: File) => {
     await fetch(`/example/${file.name}`, {
       method: 'DELETE',
-      signal: abortCtrl.current.signal
+      signal: abortCtrl.current?.signal
     });
   };
 

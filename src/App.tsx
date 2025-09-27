@@ -1,21 +1,29 @@
 import { useState } from 'react';
 import { MockedUpload } from './MockedUpload';
 import { RealUpload } from './RealUpload';
+import { FormUpload } from './FormUpload';
 
+type Variant = 'mock' | 'real' | 'form' | 'collect';
 export default function App() {
-  const [useRealUpload, setRealUpload] = useState(false);
+  const [demoVariant, setDemoVariant] = useState<Variant>('form');
   return (
     <>
       <div>
-        <input
-          type="checkbox"
+        <label htmlFor="type">Select variant: </label>
+        <select
           id="type"
-          checked={useRealUpload}
-          onChange={(e) => setRealUpload(e.target.checked)}
-        />
-        <label htmlFor="type">Use real upload</label>
+          value={demoVariant}
+          onChange={(e) => setDemoVariant(e.target.value as Variant)}
+        >
+          <option value="mock">Mocked upload</option>
+          <option value="real">Read upload</option>
+          <option value="form">Inside form</option>
+          <option value="collect">Collect files on client</option>
+        </select>
       </div>
-      {useRealUpload ? <RealUpload /> : <MockedUpload />}
+      {demoVariant === 'mock' && <MockedUpload />}
+      {demoVariant === 'real' && <RealUpload />}
+      {demoVariant === 'form' && <FormUpload />}
     </>
   );
 }

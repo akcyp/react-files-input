@@ -19,19 +19,19 @@ export interface FileUploaderState {
 export type FileUploaderAction =
   | { type: 'clear' }
   | { type: 'setMaxSize'; size: number }
-  | { type: 'upload'; file: File }
-  | { type: 'started'; file: File }
+  | { type: 'upload'; files: File[] }
+  | { type: 'started'; name: string }
   | {
       type: 'finished-upload';
-      file: File;
+      name: string;
       status: FileUploadStatus;
       message?: string;
     }
-  | { type: 'reload'; file: File }
-  | { type: 'delete'; file: File }
+  | { type: 'reload'; name: string }
+  | { type: 'delete'; name: string }
   | {
       type: 'finished-delete';
-      file: File;
+      name: string;
       status: FileUploadStatus;
       message?: string;
     };
@@ -52,20 +52,24 @@ export const fileUploaderReducer = (
       };
     }
     case 'upload': {
-      if (state.items.length >= state.maxFiles) return state;
-      if (state.items.some((item) => item.name === action.file.name)) return state;
+      const currentNames = state.items.map((item) => item.name);
+      const newFiles = action.files.filter((file) => !currentNames.includes(file.name));
+      if (state.items.length + newFiles.length > state.maxFiles) return state;
       return {
         ...state,
         items: [
           ...state.items,
-          {
-            name: action.file.name,
-            file: action.file,
-            action: 'upload',
-            status: 'loading',
-            pending: false,
-            finished: false
-          }
+          ...newFiles.map(
+            (file) =>
+              ({
+                name: file.name,
+                file: file,
+                action: 'upload',
+                status: 'loading',
+                pending: false,
+                finished: false
+              }) as const
+          )
         ]
       };
     }
@@ -73,10 +77,9 @@ export const fileUploaderReducer = (
       return {
         ...state,
         items: state.items.map((item) =>
-          item.file.name === action.file.name
+          item.name === action.name
             ? {
-                name: action.file.name,
-                file: action.file,
+                ...item,
                 action: 'upload',
                 status: 'loading',
                 pending: false,
@@ -90,7 +93,7 @@ export const fileUploaderReducer = (
       return {
         ...state,
         items: state.items.map((item) =>
-          item.name === action.file.name
+          item.name === action.name
             ? {
                 ...item,
                 pending: true
@@ -103,7 +106,7 @@ export const fileUploaderReducer = (
       return {
         ...state,
         items: state.items.map((item) =>
-          item.name === action.file.name
+          item.name === action.name
             ? {
                 ...item,
                 action: 'upload',
@@ -120,11 +123,10 @@ export const fileUploaderReducer = (
       return {
         ...state,
         items: state.items.map((item) =>
-          item.name === action.file.name
+          item.name === action.name
             ? {
+                ...item,
                 status: 'loading',
-                file: item.file,
-                name: item.name,
                 action: 'delete',
                 pending: false,
                 finished: false
@@ -138,9 +140,9 @@ export const fileUploaderReducer = (
         ...state,
         items:
           action.status === 'success'
-            ? state.items.filter((item) => item.name !== action.file.name)
+            ? state.items.filter((item) => item.name !== action.name)
             : state.items.map((item) =>
-                item.file.name === action.file.name
+                item.name === action.name
                   ? {
                       ...item,
                       action: 'delete',

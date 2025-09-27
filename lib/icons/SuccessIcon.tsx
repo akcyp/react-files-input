@@ -5,7 +5,7 @@ export const SuccessIcon = () => (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 16 16"
     fill="currentColor"
-    className="size-4 text-green-500"
+    className=":uno: size-4 text-green-500"
   >
     <path
       fillRule="evenodd"

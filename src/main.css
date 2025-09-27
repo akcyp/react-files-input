@@ -14,7 +14,7 @@ html,
   flex-direction: column;
 }
 
-#root > div {
+.react-files-upload {
   width: 600px;
 }
 
