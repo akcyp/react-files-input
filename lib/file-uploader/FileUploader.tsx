@@ -5,13 +5,12 @@ import {
   useEffect,
   useId,
   useMemo,
-  useReducer,
   useRef,
   useState
 } from 'react';
 import cx from 'classnames';
 import { File } from './File';
-import { fileUploaderReducer } from './FileUploaderReducer';
+import { useUploader } from './useUploader';
 import { UploadIcon } from '../icons/UploadIcon';
 
 export interface FileUploaderProps {
@@ -66,77 +65,22 @@ export const FileUploader = (props: FileUploaderProps) => {
 
   const nativeFileInputRef = useRef<HTMLInputElement>(null);
   const [cursor, setCursor] = useState<'default' | 'allowed' | 'disallowed'>('default');
-  const [state, dispatch] = useReducer(fileUploaderReducer, {
-    maxFiles,
-    items: []
+  const [items, { uploadFile, deleteFile, retryFile }] = useUploader({
+    onFileDelete,
+    onFileUpload,
+    maxFiles
   });
-
-  useEffect(() => {
-    dispatch({ type: 'setMaxSize', size: maxFiles });
-  }, [maxFiles]);
-
-  useEffect(() => {
-    for (const item of state.items) {
-      if (item.pending || item.finished) continue;
-      if (item.action === 'upload') {
-        dispatch({ type: 'started', name: item.name });
-        onFileUpload(item.file)
-          .then((message) => {
-            dispatch({
-              type: 'finished-upload',
-              name: item.name,
-              status: 'success',
-              message
-            });
-          })
-          .catch((message) => {
-            dispatch({
-              type: 'finished-upload',
-              name: item.name,
-              status: 'error',
-              message: message.toString()
-            });
-          });
-      }
-      if (item.action === 'delete') {
-        dispatch({ type: 'started', name: item.name });
-        onFileDelete(item.file)
-          .then(() => {
-            dispatch({
-              type: 'finished-delete',
-              name: item.name,
-              status: 'success'
-            });
-          })
-          .catch((message) => {
-            dispatch({
-              type: 'finished-delete',
-              name: item.name,
-              status: 'error',
-              message
-            });
-          });
-      }
-    }
-  }, [state.items, onFileUpload, onFileDelete]);
-
-  useEffect(() => {
-    return () => {
-      // Cancel all calls
-      dispatch({ type: 'clear' });
-    };
-  }, []);
 
   useEffect(() => {
     // We will update native input "files" prop to support native form submitting process, when <FileUploader> is placed under <form> element
     if (!nativeFileInputRef.current) return;
     const dataTransfer = new DataTransfer();
-    for (const { file } of state.items) {
+    for (const { file } of items) {
       dataTransfer.items.add(file);
     }
     nativeFileInputRef.current.value = '';
     nativeFileInputRef.current.files = dataTransfer.files.length ? dataTransfer.files : null;
-  }, [state]);
+  }, [items]);
 
   const isFileAllowed = useCallback(
     (file: File | DataTransferItem) => {
@@ -152,13 +96,13 @@ export const FileUploader = (props: FileUploaderProps) => {
       const files = Array.from(event.dataTransfer.items);
       if (!files.length) {
         setCursor('default');
-      } else if (files.some(isFileAllowed) && state.items.length < state.maxFiles) {
+      } else if (files.some(isFileAllowed) && items.length < maxFiles) {
         setCursor('allowed');
       } else {
         setCursor('disallowed');
       }
     },
-    [state, isFileAllowed]
+    [items, maxFiles, isFileAllowed]
   );
 
   const onDragLeave: DragEventHandler<HTMLDivElement> = useCallback((event) => {
@@ -166,31 +110,43 @@ export const FileUploader = (props: FileUploaderProps) => {
     setCursor('default');
   }, []);
 
-  const onDrop: DragEventHandler<HTMLDivElement> = useCallback((event) => {
-    event.preventDefault();
-    setCursor('default');
-    const droppedFiles = Array.from(event.dataTransfer.files);
-    dispatch({ type: 'upload', files: droppedFiles });
-  }, []);
+  const onDrop: DragEventHandler<HTMLDivElement> = useCallback(
+    (event) => {
+      event.preventDefault();
+      setCursor('default');
+      const droppedFiles = Array.from(event.dataTransfer.files);
+      uploadFile(droppedFiles);
+    },
+    [uploadFile]
+  );
 
-  const onFileInputChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
-    const selectedFiles = Array.from(event.target.files ?? []);
-    dispatch({ type: 'upload', files: selectedFiles });
-  }, []);
+  const onFileInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const selectedFiles = Array.from(event.target.files ?? []);
+      uploadFile(selectedFiles);
+    },
+    [uploadFile]
+  );
 
-  const handleFileDelete = useCallback((name: string) => {
-    dispatch({ type: 'delete', name });
-  }, []);
+  const handleFileDelete = useCallback(
+    (file: File) => {
+      deleteFile(file);
+    },
+    [deleteFile]
+  );
 
-  const handleFileReload = useCallback((name: string) => {
-    dispatch({ type: 'reload', name });
-  }, []);
+  const handleFileReload = useCallback(
+    (file: File) => {
+      retryFile(file);
+    },
+    [retryFile]
+  );
 
   return (
     <div
       className={cx(
         'react-files-upload',
-        ':uno: box-border flex flex-col items-center justify-center w-full min-h-64 border-2 border-dashed border-gray-300 rounded-lg',
+        ':uno: min-h-[175px] box-border flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg',
         {
           [':uno: bg-gray-50']: cursor === 'default',
           [':uno: bg-green-100']: cursor === 'allowed',
@@ -204,9 +160,10 @@ export const FileUploader = (props: FileUploaderProps) => {
     >
       <label
         htmlFor={dropZoneFileInputId}
-        className={cx(':uno: w-full h-32', {
-          [':uno: cursor-pointer']: state.items.length < maxFiles,
-          [':uno: cursor-not-allowed']: state.items.length >= maxFiles
+        className={cx(':uno: w-full', {
+          [':uno: cursor-pointer']: items.length < maxFiles,
+          [':uno: cursor-not-allowed']: items.length >= maxFiles,
+          [':uno: pointer-events-none']: items.length >= maxFiles
         })}
       >
         <div className=":uno: flex flex-col items-center justify-center pt-5 pb-6">
@@ -216,29 +173,29 @@ export const FileUploader = (props: FileUploaderProps) => {
           </p>
           <p className=":uno: m-0 text-xs text-gray-500 dark:text-gray-400">{description}</p>
         </div>
-        <input
-          accept={fileTypes.length === 0 ? undefined : fileTypes.join(',')}
-          multiple={maxFiles > 1}
-          disabled={state.items.length >= maxFiles}
-          id={dropZoneFileInputId}
-          type="file"
-          name={inputName}
-          className=":uno: hidden"
-          onChange={onFileInputChange}
-          ref={nativeFileInputRef}
-        />
       </label>
-      {!!state.items.length && (
-        <div className=":uno: box-border flex flex-col w-full p-4 space-y-1">
-          {state.items.map((file) => (
+      <input
+        accept={fileTypes.length === 0 ? undefined : fileTypes.join(',')}
+        multiple={maxFiles > 1}
+        readOnly={items.length >= maxFiles}
+        id={dropZoneFileInputId}
+        type="file"
+        name={inputName}
+        className=":uno: hidden"
+        onChange={onFileInputChange}
+        ref={nativeFileInputRef}
+      />
+      {!!items.length && (
+        <div className=":uno: box-border flex flex-col w-full p-4 space-y-1 overflow-auto">
+          {items.map((file) => (
             <File
               key={file.name}
               action={file.action}
               name={file.name}
               status={file.status}
               message={file.message}
-              handleDelete={() => handleFileDelete(file.name)}
-              handleReload={() => handleFileReload(file.name)}
+              handleDelete={() => handleFileDelete(file.file)}
+              handleReload={() => handleFileReload(file.file)}
             />
           ))}
         </div>

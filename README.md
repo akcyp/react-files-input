@@ -111,3 +111,40 @@ export default function App() {
   );
 };
 ```
+
+## Example 4 - collect files without sending
+
+```tsx
+import { useState } from 'react';
+import { FileUploader } from 'react-files-upload';
+
+export const CollectUpload = () => {
+  const [files, setFiles] = useState<File[]>([]);
+
+  const onFileUpload = async (file: File) => {
+    setFiles(files => [...files, file]);
+    return `Success: ${file.name} collected`;
+  };
+
+  const onFileDelete = async (file: File) => {
+    setFiles(files.filter(item => item.name !== file.name));
+  };
+
+  const onCollect = () => {
+    alert(`Files collected (${files.length})`);
+  };
+
+  return (
+    <div>
+      <FileUploader
+        maxFiles={3}
+        fileTypes={['image/png', 'image/jpeg', 'image/svg', 'image/gif']}
+        description="PNG, JPG, SVG or GIF"
+        onFileUpload={onFileUpload}
+        onFileDelete={onFileDelete}
+      />
+      <button onClick={onCollect}>Collect</button>
+    </div>
+  );
+};
+```
