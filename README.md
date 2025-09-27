@@ -25,17 +25,17 @@ import { FileUploader } from 'react-files-upload';
 const randomInt = (min: number, max: number) => Math.round(Math.random() * (max - min) + max);
 const sleep = (ts: number) => new Promise(res => setTimeout(res, ts));
 
-const onFileUpload = async (file: File, _: AbortController): Promise<string> => {
-  const timeToResolve = Math.random() * randomInt(1000, 3000);
-  await sleep(timeToResolve);
-  const success = Math.random() > 0.5;
-  if (success) {
-    return `Success: ${file.name} saved`;
-  }
-  throw `Error: ${file.name} not saved`;
-};
-
 export default function App() {
+  const onFileUpload = async (file: File): Promise<string> => {
+    const timeToResolve = Math.random() * randomInt(1000, 3000);
+    await sleep(timeToResolve);
+    const success = Math.random() > 0.5;
+    if (success) {
+      return `Success: ${file.name} saved`;
+    }
+    throw `Error: ${file.name} not saved`;
+  };
+
   return (
     <FileUploader
       maxFiles={3}

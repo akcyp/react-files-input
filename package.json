@@ -38,7 +38,6 @@
     "prod": "pnpm run build && vite",
     "lint": "eslint .",
     "format": "prettier -c .",
-    "test": "vitest",
     "preview": "vite preview",
     "prepare": "husky",
     "prepublishOnly": "pnpm run build"

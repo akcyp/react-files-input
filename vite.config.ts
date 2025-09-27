@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     UnoCSS({
-      mode: 'dist-chunk'
+      mode: mode === 'build:ci' ? 'global' : 'dist-chunk'
     }),
     eslint(),
     mode !== 'build:ci' &&
