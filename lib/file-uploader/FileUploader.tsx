@@ -6,12 +6,12 @@ import {
   useMemo,
   useReducer,
   useRef,
-  useState,
+  useState
 } from 'react';
 import cx from 'classnames';
-import { UploadIcon } from '../icons/UploadIcon';
 import { File } from './File';
 import { fileUploaderReducer } from './FileUploaderReducer';
+import { UploadIcon } from '../icons/UploadIcon';
 
 export interface FileUploaderProps {
   /**
@@ -31,59 +31,82 @@ export interface FileUploaderProps {
   /**
    * Callback to handle single file upload
    */
-  onFileUpload: (file: File, abortCtrl: AbortController) => Promise<string>;
+  onFileUpload: (file: File) => Promise<string>;
+  /**
+   * Callback to handle single file delete
+   */
+  onFileDelete: (file: File) => Promise<void>;
 }
 
 export const FileUploader = (props: FileUploaderProps) => {
-  const { maxFiles, fileTypes, description, onFileUpload } = useMemo(
+  const { maxFiles, fileTypes, description, onFileUpload, onFileDelete } = useMemo(
     () =>
       ({
         maxFiles: 1,
         fileTypes: [],
         description: '',
-        ...props,
-      } satisfies Required<FileUploaderProps>),
+        ...props
+      }) satisfies Required<FileUploaderProps>,
     [props]
   );
 
   const nativeFileInputRef = useRef<HTMLInputElement>(null);
+  const [cursor, setCursor] = useState<'default' | 'allowed' | 'disallowed'>('default');
   const [state, dispatch] = useReducer(fileUploaderReducer, {
     maxFiles,
-    items: [],
+    items: []
   });
 
   useEffect(() => {
     dispatch({ type: 'setMaxSize', size: maxFiles });
   }, [maxFiles]);
 
-  const [cursor, setCursor] = useState<'default' | 'allowed' | 'disallowed'>(
-    'default'
-  );
-
   useEffect(() => {
-    // To meet task requirements I'm going to perform simulated calls
     for (const item of state.items) {
       if (item.pending || item.finished) continue;
-      dispatch({ type: 'started', filename: item.name });
-      onFileUpload(item.file, item.abortController)
-        .then((message) => {
-          dispatch({
-            type: 'finished',
-            filename: item.name,
-            status: 'success',
-            message,
+      if (item.action === 'upload') {
+        console.log('upload', item);
+        dispatch({ type: 'started', file: item.file });
+        onFileUpload(item.file)
+          .then((message) => {
+            dispatch({
+              type: 'finished-upload',
+              file: item.file,
+              status: 'success',
+              message
+            });
+          })
+          .catch((message) => {
+            dispatch({
+              type: 'finished-upload',
+              file: item.file,
+              status: 'error',
+              message: message.toString()
+            });
           });
-        })
-        .catch((message) => {
-          dispatch({
-            type: 'finished',
-            filename: item.name,
-            status: 'error',
-            message,
+      }
+      if (item.action === 'delete') {
+        console.log(`delete`, item);
+        dispatch({ type: 'started', file: item.file });
+        onFileDelete(item.file)
+          .then(() => {
+            dispatch({
+              type: 'finished-delete',
+              file: item.file,
+              status: 'success'
+            });
+          })
+          .catch((message) => {
+            dispatch({
+              type: 'finished-delete',
+              file: item.file,
+              status: 'error',
+              message
+            });
           });
-        });
+      }
     }
-  }, [state.items, onFileUpload]);
+  }, [state.items, onFileUpload, onFileDelete]);
 
   useEffect(() => {
     return () => {
@@ -116,10 +139,7 @@ export const FileUploader = (props: FileUploaderProps) => {
       const files = Array.from(event.dataTransfer.items);
       if (!files.length) {
         setCursor('default');
-      } else if (
-        files.some(isFileAllowed) &&
-        state.items.length < state.maxFiles
-      ) {
+      } else if (files.some(isFileAllowed) && state.items.length < state.maxFiles) {
         setCursor('allowed');
       } else {
         setCursor('disallowed');
@@ -138,33 +158,34 @@ export const FileUploader = (props: FileUploaderProps) => {
     setCursor('default');
     const droppedFiles = Array.from(event.dataTransfer.files);
     for (const file of droppedFiles) {
-      dispatch({ type: 'add', file });
+      dispatch({ type: 'upload', file });
     }
   }, []);
 
-  const onFileInputChange: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      const selectedFiles = Array.from(event.target.files ?? []);
-      for (const file of selectedFiles) {
-        dispatch({ type: 'add', file });
-      }
-    },
-    []
-  );
+  const onFileInputChange: ChangeEventHandler<HTMLInputElement> = useCallback((event) => {
+    const selectedFiles = Array.from(event.target.files ?? []);
+    for (const file of selectedFiles) {
+      dispatch({ type: 'upload', file });
+    }
+  }, []);
 
-  const handleFileDelete = useCallback((filename: string) => {
-    dispatch({ type: 'remove', filename });
+  const handleFileDelete = useCallback((file: File) => {
+    dispatch({ type: 'delete', file });
+  }, []);
+
+  const handleFileReload = useCallback((file: File) => {
+    dispatch({ type: 'reload', file });
   }, []);
 
   return (
     <div
       className={cx(
-        'flex flex-col items-center justify-center w-full min-h-64 border-2 border-dashed border-gray-300 rounded-lg',
+        'box-border flex flex-col items-center justify-center w-full min-h-64 border-2 border-dashed border-gray-300 rounded-lg',
         {
           ['bg-gray-50']: cursor === 'default',
           ['bg-green-100']: cursor === 'allowed',
           ['bg-red-100']: cursor === 'disallowed',
-          ['hover:bg-gray-100']: cursor === 'default',
+          ['hover:bg-gray-100']: cursor === 'default'
         }
       )}
       onDragOver={onDragOver}
@@ -175,18 +196,15 @@ export const FileUploader = (props: FileUploaderProps) => {
         htmlFor="dropzone-file"
         className={cx('w-full h-32', {
           ['cursor-pointer']: state.items.length < maxFiles,
-          ['cursor-not-allowed']: state.items.length >= maxFiles,
+          ['cursor-not-allowed']: state.items.length >= maxFiles
         })}
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <UploadIcon />
-          <p className="mt-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
-            <span className="font-semibold">Click to upload</span> or drag and
-            drop
+          <p className="m-0 mt-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
+            <span className="font-semibold">Click to upload</span> or drag and drop
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {description}
-          </p>
+          <p className="m-0 text-xs text-gray-500 dark:text-gray-400">{description}</p>
         </div>
         <input
           accept={fileTypes.length === 0 ? undefined : fileTypes.join(',')}
@@ -200,9 +218,14 @@ export const FileUploader = (props: FileUploaderProps) => {
         />
       </label>
       {!!state.items.length && (
-        <div className="flex flex-col w-full p-4 space-y-1">
+        <div className="box-border flex flex-col w-full p-4 space-y-1">
           {state.items.map((file) => (
-            <File key={file.name} {...file} handleDelete={handleFileDelete} />
+            <File
+              key={file.name}
+              {...file}
+              handleDelete={() => handleFileDelete(file.file)}
+              handleReload={() => handleFileReload(file.file)}
+            />
           ))}
         </div>
       )}
