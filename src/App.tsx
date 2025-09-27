@@ -7,7 +7,7 @@ import { CollectUpload } from './CollectUpload';
 type Variant = 'mock' | 'real' | 'form' | 'collect';
 
 export default function App() {
-  const [demoVariant, setDemoVariant] = useState<Variant>('form');
+  const [demoVariant, setDemoVariant] = useState<Variant>('mock');
   return (
     <div>
       <div className="flex flex-col mb-3">

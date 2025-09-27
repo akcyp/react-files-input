@@ -16,7 +16,7 @@ const onFileUpload = async (file: File): Promise<string> => {
 const onFileDelete = async (file: File): Promise<void> => {
   const timeToResolve = Math.random() * randomInt(1000, 3000);
   await sleep(timeToResolve);
-  const success = Math.random() > 0.5;
+  const success = Math.random() > 0.2;
   if (!success) {
     throw `Error: ${file.name} cannot be deleted`;
   }

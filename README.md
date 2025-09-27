@@ -17,6 +17,16 @@
 # Not yet available
 ```
 
+## Import
+
+```css
+@import "react-files-upload/dist/index.css";
+```
+
+```tsx
+import { FileUploader } from 'react-files-upload';
+```
+
 ## Example 1 - mock upload
 
 ```tsx
