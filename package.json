@@ -25,10 +25,7 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./dist/*.css": {
-      "import": "./dist/*.css",
-      "require": "./dist/*.css"
-    }
+    "./styles.css": "./dist/index.css"
   },
   "files": [
     "dist"
@@ -52,29 +49,29 @@
   },
   "dependencies": {
     "classnames": "^2.5.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@types/node": "^24.5.2",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@eslint/js": "^9.36.0",
+    "@types/node": "^24.6.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "@unocss/preset-wind3": "^66.5.2",
     "@unocss/transformer-compile-class": "^66.5.2",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
-    "globals": "^15.14.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.23",
+    "globals": "^15.15.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.1",
+    "lint-staged": "^16.2.3",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.18.2",
+    "typescript": "~5.7.3",
+    "typescript-eslint": "^8.45.0",
     "unocss": "^66.5.2",
-    "vite": "^6.0.5",
+    "vite": "^6.3.6",
     "vite-plugin-dts": "^4.5.4",
     "vite-plugin-eslint2": "^5.0.4"
   },

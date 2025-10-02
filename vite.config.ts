@@ -13,6 +13,9 @@ const libraryOptions: UserConfig = {
       entry: resolve(__dirname, 'lib/index.ts'),
       formats: ['es'],
       fileName: 'index'
+    },
+    rollupOptions: {
+      external: ['react', 'react/jsx-runtime']
     }
   }
 };

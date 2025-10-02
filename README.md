@@ -19,11 +19,8 @@
 
 ## Import
 
-```css
-@import "react-files-upload/dist/index.css";
-```
-
 ```tsx
+import 'react-files-upload/styles.css';
 import { FileUploader } from 'react-files-upload';
 ```
 

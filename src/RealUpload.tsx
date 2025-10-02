@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { FileUploader } from '../lib';
 
 export const RealUpload = () => {
-  const abortCtrl = useRef<AbortController>();
+  const abortCtrl = useRef<AbortController>(null);
 
   useEffect(() => {
     abortCtrl.current = new AbortController();
