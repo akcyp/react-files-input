@@ -1,4 +1,4 @@
-# react-files-upload
+# react-files-input
 
 ![Preview](./preview-1.jpg)
 ![Preview](./preview-3.jpg)
@@ -14,7 +14,12 @@
 ## Installation
 
 ```sh
-# Not yet available
+# with npm
+npm i react-files-input
+# with yarn
+yarn add react-files-input
+# with pnpm
+pnpm add react-files-input
 ```
 
 ## Import
