@@ -1,7 +1,7 @@
 {
   "name": "react-files-input",
   "description": "React component to upload multiple files",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "akcyp",
   "license": "ISC",
   "keywords": [
@@ -11,11 +11,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akcyp/react-files-upload.git"
+    "url": "git+https://github.com/akcyp/react-files-input.git"
   },
-  "homepage": "https://github.com/akcyp/react-files-upload#readme",
+  "homepage": "https://github.com/akcyp/react-files-input#readme",
   "bugs": {
-    "url": "https://github.com/akcyp/react-files-upload/issues"
+    "url": "https://github.com/akcyp/react-files-input/issues"
   },
   "main": "dist/index.js",
   "types": "./dist/index.d.ts",

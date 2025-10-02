@@ -9,7 +9,7 @@ const libraryOptions: UserConfig = {
   publicDir: false,
   build: {
     lib: {
-      name: 'react-files-upload',
+      name: 'react-files-input',
       entry: resolve(__dirname, 'lib/index.ts'),
       formats: ['es'],
       fileName: 'index'
@@ -21,7 +21,7 @@ const libraryOptions: UserConfig = {
 };
 
 const staticPageOptions: UserConfig = {
-  base: '/react-files-upload/',
+  base: '/react-files-input/',
   build: {
     outDir: 'build'
   }

@@ -145,7 +145,7 @@ export const FileUploader = (props: FileUploaderProps) => {
   return (
     <div
       className={cx(
-        'react-files-upload',
+        'react-files-input',
         ':uno: min-h-[175px] box-border flex flex-col items-center justify-center w-full border-2 border-dashed border-gray-300 rounded-lg',
         {
           [':uno: bg-gray-50']: cursor === 'default',

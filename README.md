@@ -25,14 +25,14 @@ pnpm add react-files-input
 ## Import
 
 ```tsx
-import 'react-files-upload/styles.css';
-import { FileUploader } from 'react-files-upload';
+import 'react-files-input/styles.css';
+import { FileUploader } from 'react-files-input';
 ```
 
 ## Example 1 - mock upload
 
 ```tsx
-import { FileUploader } from 'react-files-upload';
+import { FileUploader } from 'react-files-input';
 
 const randomInt = (min: number, max: number) => Math.round(Math.random() * (max - min) + max);
 const sleep = (ts: number) => new Promise(res => setTimeout(res, ts));
@@ -63,7 +63,7 @@ export default function App() {
 
 ```tsx
 import { useEffect, useRef } from 'react';
-import { FileUploader } from 'react-files-upload';
+import { FileUploader } from 'react-files-input';
 
 export default function App() {
   const abortCtrl = useRef<AbortController>();
@@ -113,7 +113,7 @@ export default function App() {
 ## Example 3 - inside form
 
 ```tsx
-import { FileUploader } from 'react-files-upload';
+import { FileUploader } from 'react-files-input';
 
 export default function App() {
   return (
@@ -128,7 +128,7 @@ export default function App() {
 
 ```tsx
 import { useState } from 'react';
-import { FileUploader } from 'react-files-upload';
+import { FileUploader } from 'react-files-input';
 
 export const CollectUpload = () => {
   const [files, setFiles] = useState<File[]>([]);
